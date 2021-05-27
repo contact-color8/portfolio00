@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="sample.css">
+  <title>ユーザー情報登録システム</title>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+
+<!--jQueryUI-->
+  <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
+  <script src="scripts/userMember.js"></script>
+
+</head>
+
+<body>
+  <div id="dlg">
+    <!--入力画面-->
+    <div id="input">
+      <p><span class="input-text">ユーザーID</span>
+        <input type="text" id="userId" value="">
+        <label id="msg-userId" class="err"></label>
+      </p>
+      <p><span class="input-text">パスワード</span>
+        <input type="text" id="password" value="">
+        <label id="msg-password" class="err"></label>
+      </p>
+    </div>
+
+    <!--確認画面-->
+    <div id="confirm">
+      <span class="exp-text">以下の内容でよろしいですか？</span>
+      <p><span class="input-text">ユーザーID</span>
+        <label id="confirm-userId"></label>
+      </p>
+      <p><span class="input-text">パスワード</span>
+        <label id="confirm-password"></label>
+      </p>
+    </div>
+
+    <!--完了画面-->
+    <div id="finish">
+      <span class="exp-text">画面を閉じてください</span>
+    </div>
+</div>
+  <div class="title">ユーザー情報登録</div>
+
+  <div id="buttons">
+    <input type="button" id="add" value="追加">
+    <input type="button" id="change" value="修正">
+    <input type="button" id="delete" value="削除">
+  </div>
+  
+  <div id="view">
+  </div>
+  
+  <script>
+    'use strict';
+    $(function(){
+
+      //描画処理
+      redraw();
+
+      //ダイアログ すべて非表示
+      $('#input').hide();
+      $('#confirm').hide();
+      $('#finish').hide();
+
+      //修正ボタンクリック時の処理
+      $('#change').on('click', function(){
+        // 選択したチェックボックスを取得
+        let checkedUserId = $(':checkbox:checked').val();
+        let findUser = getUser(checkedUserId);
+        let userId = findUser.userId;
+        let password = findUser.password;
+
+        //該当の値を表示
+        $('#userId').val(userId);
+        $('#password').val(password);
+
+        //ユーザーIDのテキストボックスは非活性
+        $('#userId').prop('disabled', true);
+
+        //ダイアログ 入力画面を表示
+        $('#input').show();
+        $('#confirm').hide();
+        $('#finish').hide();
+
+        //ダイアログ 入力画面の処理
+        $('#dlg').dialog({
+          title: '修正',
+          width: 600,
+          modal: true,
+          buttons:{
+            //OKクリック時
+            'ＯＫ':function(){
+              if($('#input').is(':visible') == true){
+                //外部ファイルの処理を実行
+                inputFunc();
+
+              } else if($('#confirm').is(':visible') == true){
+                //外部ファイルの処理を実行
+                confirmUpdateFunc();
+
+              } else if($('#finish').is(':visible') == true){
+                //外部ファイルの処理を実行
+                finishFunc();
+              }
+            },
+            //キャンセルクリック時
+            'キャンセル':function(){
+                $('#dlg').dialog('close');                                
+            }
+          }
+        })
+      });
+
+      //追加ボタンクリック時の処理
+      $('#add').on('click', function () {
+        $('#userId').prop('disabled', false);
+        $('#userId').val('');
+        $('#password').val('');
+
+        //ダイアログ 入力画面を表示
+        $('#input').show();
+        $('#confirm').hide();
+        $('#finish').hide();
+
+        //ダイアログ 入力画面の処理
+        $('#dlg').dialog({
+          title: '追加',
+          width: 600,
+          modal: true,
+          buttons:{
+            //OKクリック時
+            'ＯＫ':function(){
+              if($('#input').is(':visible') == true){
+                //外部ファイルの処理を実行
+                inputFunc();
+
+              } else if($('#confirm').is(':visible') == true){
+                //外部ファイルの処理を実行
+                confirmFunc();
+
+              } else if($('#finish').is(':visible') == true){
+                //外部ファイルの処理を実行
+                finishFunc();
+              }
+            },
+            //キャンセルクリック時
+            'キャンセル':function(){
+              $('#dlg').dialog('close');                                
+            }
+          }
+        });
+      });
+
+      //削除ボタンクリック時の処理
+      $('#delete').on('click', function(){
+        //削除有無の確認メッセージ表示
+        if(confirm('選択したデータを削除しますか？') === false){
+          //キャンセルクリック時
+          return;
+        }
+
+        //OKクリック時
+        //選択したチェックボックスをもとに該当のユーザーIDを取得
+        let delUserIds = [];
+        $(':checkbox:checked').each(function(){
+          let checkedUserId = $(this).val();
+          delUserIds.push(checkedUserId);
+        });
+
+        //jsonをセット
+        let userInfo = {
+          "userIds": delUserIds
+        }
+
+        $.ajax({
+          url: './delete',
+          type: 'post',
+          data: userInfo,
+          async: false
+        })
+        .done(function(data){
+          //描画処理
+          redraw();
+        })
+        .fail(function(){
+          alert('error');
+        });
+      })
+    });
+    
+
+  </script>
+</body>
+</html>

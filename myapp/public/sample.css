@@ -1,0 +1,46 @@
+.title {
+  margin: 10px 10px 10px 20px;
+  font-weight: bold;
+}
+
+#view {
+  margin-left: 20px;
+}
+
+#buttons {
+  margin-bottom: 20px;
+  margin-left: 20px;
+}
+
+#view li {
+  list-style: none;
+}
+
+ul.table {
+  display: table;
+  margin: 0px;
+  padding: 0px;
+}
+
+ul.table li {
+  display: table-cell;
+  border: 1px solid black;
+  width: 150px;
+}
+
+ul.table li:nth-child(1) {
+  width: 40px;
+}
+
+.err {
+  color: red;
+}
+
+.input-text {
+  display: inline-block;
+  width: 100px;
+}
+
+.exp-text {
+  font-size: 15px;
+}
